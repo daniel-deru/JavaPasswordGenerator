@@ -1,20 +1,11 @@
 import java.util.ArrayList;
 import java.lang.Math;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import Interfaces.Response;
-import static java.util.Map.entry;
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 
-class PasswordPair {
-    int numChars;
-    ArrayList<Character> chars;
-
-    PasswordPair(int numChars, ArrayList<Character> chars){
-        this.numChars = numChars;
-        this.chars = chars;
-    }
-}
 
 public class Password {
     final public static int[] NUMBERS = {48, 10};
@@ -25,16 +16,24 @@ public class Password {
     public static void main(String[] args){
         PasswordPair data = getParams();
         String password = generatePassword(data);
-        System.out.println(password);
+        CopyToClipBoard(password);
+        System.out.println("Here is your password: " + password);
+        System.out.println("Your password has already been copied to your clipboard");
 
     }
 
-    public static String generatePassword(PasswordPair data){
-        StringBuilder builder = new StringBuilder(data.numChars);
+    public static void CopyToClipBoard(String text){
+        StringSelection stringSelection = new StringSelection(text);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
+    }
 
-        for(int i = 0; i < data.numChars; i++){
-           int randomIndex = (int) Math.floor(Math.random() * data.chars.size());
-           builder.append(data.chars.get(randomIndex));
+    public static String generatePassword(PasswordPair data){
+        StringBuilder builder = new StringBuilder(data.passwordLength);
+
+        for(int i = 0; i < data.passwordLength; i++){
+           int randomIndex = (int) Math.floor(Math.random() * data.charList.size());
+           builder.append(data.charList.get(randomIndex));
         }
 
         return builder.toString();
@@ -53,7 +52,7 @@ public class Password {
     }
 
     public static ArrayList<Character> getCharRange(String numbers, String upper, String special){
-        ArrayList<Character> chars = new ArrayList<Character>();
+        ArrayList<Character> chars = new ArrayList<>();
 
         fillChars(chars, Password.LOWER[0], Password.LOWER[1]);
 
@@ -83,13 +82,14 @@ public class Password {
         Scanner sc = new Scanner(System.in);
 
         while(true){
+
             System.out.print(message);
             String result = sc.nextLine();
 
-            if(value == Response.Type.number && !sc.hasNextInt()){
+            if(value == Response.Type.number && !result.matches("\\d+")){
                 System.out.println("Please enter a numeric value");
             }
-            else if(value == Response.Type.string && !Response.validResponse(result)){
+            if(value == Response.Type.string && !Response.validResponse(result)){
                 System.out.println("Please enter the either \"y\" or \"n\"");
             }
             else {
