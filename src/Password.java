@@ -1,9 +1,20 @@
 import java.util.ArrayList;
+import java.lang.Math;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import Interfaces.Response;
 import static java.util.Map.entry;
+
+class PasswordPair {
+    int numChars;
+    ArrayList<Character> chars;
+
+    PasswordPair(int numChars, ArrayList<Character> chars){
+        this.numChars = numChars;
+        this.chars = chars;
+    }
+}
 
 public class Password {
     final public static int[] NUMBERS = {48, 10};
@@ -12,19 +23,33 @@ public class Password {
     final public static char[] SPECIAL = {'!', '@', '#','$', '%', '&', '*', ':', ';', '?', '/', '.'};
 
     public static void main(String[] args){
-//        getParams();
-
+        PasswordPair data = getParams();
+        String password = generatePassword(data);
+        System.out.println(password);
 
     }
 
-    private static void getParams(){
+    public static String generatePassword(PasswordPair data){
+        StringBuilder builder = new StringBuilder(data.numChars);
+
+        for(int i = 0; i < data.numChars; i++){
+           int randomIndex = (int) Math.floor(Math.random() * data.chars.size());
+           builder.append(data.chars.get(randomIndex));
+        }
+
+        return builder.toString();
+    }
+
+    private static PasswordPair getParams(){
         String Chars = getInput("Please enter the desired number of characters: ", Response.Type.number);
         String useNumbers = getInput("Do you want to use numbers? ", Response.Type.string);
-        String useUpper = getInput("Do you want to use Uppercase letters?", Response.Type.string);
+        String useUpper = getInput("Do you want to use Uppercase letters? ", Response.Type.string);
         String useSpecial = getInput("Do you want to use special characters? ", Response.Type.string);
 
         int numChars = Integer.parseInt(Chars);
         ArrayList<Character> chars = getCharRange(useNumbers, useUpper, useSpecial);
+
+        return new PasswordPair(numChars, chars);
     }
 
     public static ArrayList<Character> getCharRange(String numbers, String upper, String special){
